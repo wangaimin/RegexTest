@@ -83,6 +83,8 @@
   <ItemGroup>
     <Content Include="knockout.validation.zh-CN_C35751.js" />
     <Content Include="TextFile1.txt" />
+    <Content Include="常用正则.txt" />
+    <Content Include="正则练习.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

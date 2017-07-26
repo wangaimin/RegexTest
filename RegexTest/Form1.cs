@@ -116,14 +116,19 @@ namespace RegexTest
 
         }
 
+        /// <summary>
+        /// 提取js中的中文
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnJS_Click(object sender, EventArgs e)
         {
 
-            //tag1为别名，后面会引用( 规则(?<name>规则)  )；
+            //tag1为别名，后面会引用( 规则(?<name>规则)  )；前面和后面完全匹配，例如前面为  start  ，后面也必须为start  ( "start123start")
             //['"]取'或"；
             //[^\r\n]非换行符或回车   
             //匹配双字节字符(包括汉字在内)：[^\x00-\xff]
-            Regex regexEnum = new Regex(@"(?<tag1>['""])([^\r\n]*[^\x00 -\xff]+)\k<tag1>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            Regex regexEnum = new Regex(@"(?<tag>['""])([^\r\n]*[^\x00-\xff]+[^\r\n]*)\k<tag>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string path = baseDirectory.Substring(0, baseDirectory.LastIndexOf("\\bin"));
@@ -142,6 +147,26 @@ namespace RegexTest
                 }
             }
 
+
+        }
+
+        private void btnService_Click(object sender, EventArgs e)
+        {
+            //
+            Regex regex = new Regex(@"""([^\r\n]*[^\x00-\xff]+[^\r\n]*)""",RegexOptions.Multiline);
+        }
+
+        private void btnCsHtml_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            string str = textBox1.Text.Trim();
+            string pattern = "(?!^)(?=(.{4})+$)";
+            Regex regex = new Regex(pattern, RegexOptions.Multiline);
+            textBox1.Text=regex.Replace(str, " ");
 
         }
     }

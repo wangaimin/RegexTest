@@ -1,0 +1,357 @@
+﻿@using YZ.JC.Entity;
+@using YZ.Utility;
+@using YZ.JsonRpc.Client;
+@{
+    ViewBag.Title                        = "集采中心";
+    Layout                               = "~/Views/Shared/_SimpleMainNoNavi.cshtml";
+    string SystemCategory                = Request.QueryString["SystemCategory"];
+    List<int> categoryLst                = new List<int>( );
+    YZ.JC.Entity.SystemCategory Category = null;
+    
+    if ( SystemCategory != null )
+    {
+        Category = Rpc.Call<YZ.JC.Entity.SystemCategory>
+        ( "OperationService.SystemCategoryService.LoadSystemCategory", SystemCategory );
+
+    }
+    //待办
+    int UserSysNo                          = (int)ViewData["UserSysNo"];
+    ViewData["TenderToDoNumberOpen"]       = Rpc.Call<List<TenderToDoNumber>>( "TenderService.TenderBasicInfoService.QueryNumberTenderOpenTenderUser", UserSysNo, TenderStatus.OpenTender );
+    ViewData["TenderToDoNumberEvaluation"] = Rpc.Call<List<TenderToDoNumber>>( "TenderService.TenderBasicInfoService.QueryNumberTenderEvaluationUser", UserSysNo, TenderStatus.EvaluateTender );
+
+}
+@functions{
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="SystemCategory"></param>
+    /// <param name="Status"></param>
+    /// <returns></returns>
+    public int GetToDoTaskNumber( int SystemCategory, TenderStatus Status )
+    {
+        List<TenderToDoNumber> list = null;
+        if (Status == TenderStatus.OpenTender)
+        {
+            list = ViewData["TenderToDoNumberOpen"] as List<TenderToDoNumber>;
+        }
+        else if (Status == TenderStatus.EvaluateTender)
+        {
+            list = ViewData["TenderToDoNumberEvaluation"] as List<TenderToDoNumber>;
+        }
+        if (list == null) return 0;
+        List<TenderToDoNumber> num = list.FindAll(_ => _.SystemCategorySysNo == SystemCategory || SystemCategory == -1);
+        if (num == null || num.Count == 0) return 0;
+        int number = 0;
+        foreach (var item in num)
+        {
+            number += item.Number;
+        }
+        return number;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userSysNo"></param>
+    /// <param name="nodeCode"></param>
+    /// <returns></returns>
+    public int GetRequireAuditNumber(int userSysNo, string nodeCode )
+    {
+
+        var filter = new QF_AuditFlowInstanceAuditRecord
+        {
+            AuditUserSysNo                = userSysNo,
+            NodeCode                      = nodeCode,
+            AuditStatusList               = new AuditRecordStatus[] { AuditRecordStatus.Pending },
+            IsFilterPendingRecordIfFailed = true,
+        };
+
+        var data = Rpc.Call<QueryResult<QR_AuditFlowInstanceAuditRecord>>( "AuditService.AuditFlowInstanceAuditRecordService.QueryAuditFlowInstanceAuditRecordList", filter );
+
+        return data.recordsTotal;
+    }
+}
+
+@{
+
+    ViewBag.TodoNumber   = 0;
+    ViewBag.TodoNumber   = Rpc.Call<int>( "TenderService.TenderBasicInfoService.QueryNumberTenderToDo", UserSysNo );
+    //待办开标
+    ViewBag.TodoOpen     = 0;
+    //待办评标
+    ViewBag.TodoEvaluate = 0;
+    
+    if ( Category != null )
+    {
+        categoryLst.Add( Category.SysNo );
+        
+        ViewBag.TodoOpen     = GetToDoTaskNumber( Category.SysNo, TenderStatus.OpenTender );
+        ViewBag.TodoEvaluate = GetToDoTaskNumber( Category.SysNo, TenderStatus.EvaluateTender );
+    }
+    else
+    {
+        ViewBag.TodoOpen     = GetToDoTaskNumber( -1, TenderStatus.OpenTender );
+        ViewBag.TodoEvaluate = GetToDoTaskNumber( -1, TenderStatus.EvaluateTender );
+    } 
+    // 待审批
+    int AuditNumber0001 = GetRequireAuditNumber( UserSysNo, "0001" );
+    int AuditNumber0002 = GetRequireAuditNumber( UserSysNo, "0002" );
+    int AuditNumber0003 = GetRequireAuditNumber( UserSysNo, "0003" );
+    int AuditNumber0004 = GetRequireAuditNumber( UserSysNo, "0004" );
+    int AuditNumber1002 = GetRequireAuditNumber( UserSysNo, "1002" );
+    int AuditNumber2000 = GetRequireAuditNumber( UserSysNo, "2000" );
+            
+}
+
+@section rsHeader{
+    <style>
+        .home.widget-body{
+            margin-bottom:20px;
+            padding:0;
+            box-shadow:none;
+            border:1px #e8e8e8 solid;
+            box-sizing:border-box;
+        }
+        .home-panel{
+            margin:0;
+            padding:0;
+            min-height:170px;
+        }
+        .home-panel>div{
+            border:1px #e8e8e8 solid;
+            box-sizing:border-box;
+        }
+        .home-panel .h-title{
+            font-family: 'STHeiti','Microsoft YaHei';
+            font-size:24px;
+            color:#555;
+            padding-left:25px;
+        }
+        .home-panel .h-content{
+            padding:25px;
+            height:114px;
+            overflow: hidden;
+            color:#666;
+        }
+        .home-panel .h-content ul{
+            padding:0;
+            overflow:hidden;
+            list-style:none;
+        }
+        .home-panel .h-content ul li{
+            float:left;
+            font-size:16px;
+            height:34px;
+            line-height:32px;
+        }
+        .h-content ul li a{
+            text-decoration:none;
+        }
+        .h-content ul li a.active{
+            font-weight:600;
+            color:#f76646;
+        }
+        .h-content ul li a.disabled{
+            font-weight:600;
+            color:#aaaaaa;
+            cursor:default;
+        }
+        .h-content ul.col-3 li{
+            width:33.3%
+        }
+        .h-content ul.col-4 li{
+            width:25%
+        }
+        .h-content ul.col-7 li{
+            width:14.2%
+        }
+        .home-panel ul.systemlist{
+            padding:0;
+            list-style:none;
+            text-align:center
+        }
+        .home-panel ul.systemlist li{
+            display:inline-block;
+            padding:25px;
+            text-align:center;
+        }
+        ul.systemlist li a{
+            text-decoration:none;
+        }
+        ul.systemlist li a p.system-name{
+            padding-top:10px;
+            font-size:18px;
+            color:#555;
+        }
+        a.btn-new-Tender{
+            padding:5px 30px;
+            border:1px solid #f76646;
+            border-radius:3px;
+        }
+        
+        @@media screen and (max-width: 1280px) {
+            .h-content ul.col-7 li{
+                width:25%;
+            }
+            .home-panel ul.systemlist li{
+                display:inline-block;
+                padding:25px;
+                text-align:center;
+                width:18%;
+            }
+        }
+    </style>
+}
+
+@section rsContent{
+    <div class="page-body">
+        <div class="widgit">
+            <div class="widget-body home">
+                <div class="row home-panel">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <h2 class="h-title">招标提醒</h2>
+                        <div class="h-content">
+                            <ul class="row">
+                                <li class="col-lg-3 col-md-6">待办任务：<a href="@(ViewBag.TodoNumber > 0 ? Url.Action("List", "TenderMgt/Tender", new  { Redirect = 0 } ) : "javascript:void(0);")" class="@(ViewBag.TodoNumber > 0 ? "active" : "disabled")">@(ViewBag.TodoNumber)</a></li>
+                                <li class="col-lg-3 col-md-6">待开标：<a href="@(ViewBag.TodoOpen > 0 ?  Url.Action("List", "TenderMgt/Tender", new  { Redirect = 1 } ) : "javascript:void(0);")" class="@(ViewBag.TodoOpen > 0 ? "active" : "disabled")">@(ViewBag.TodoOpen)</a></li>
+                                <li class="col-lg-3 col-md-6">待评标：<a href="@(ViewBag.TodoEvaluate > 0 ? Url.Action("List", "TenderMgt/Tender", new  { Redirect = 2 } ) :"javascript:void(0);")" class="@(ViewBag.TodoEvaluate > 0 ? "active" : "disabled")">@(ViewBag.TodoEvaluate)</a></li>
+                                @if ( YZ.Utility.Web.AuthManager.HasAuth( FunctionKeys.TenderMgt_Tender_Add ) )
+                                {
+                                <li class="col-lg-3 col-md-6"><a class="btn btn-defaullt btn-new-Tender" href="@Url.Action("TenderCategory", "TenderMgt/TenderInvitation" )">新增招标</a></li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <h2 class="h-title">交易提醒</h2>
+                        <div class="h-content">
+                            <ul class="row">
+                                <li class="col-lg-4 col-md-6">待发货订单：<a href="#" class="disabled @*active*@">0</a></li>
+                                <li class="col-lg-4 col-md-6">待评价订单：<a href="#" class="disabled @*active*@">0</a></li>
+                                <li class="col-lg-4 col-md-6">待付款订单：<a href="#" class="disabled">0</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="row home-panel">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <h2 class="h-title">审批提醒</h2>
+                        <div class="h-content">
+                            <ul class="col-7">
+                                <li>招标公告待审批：<a href="@(AuditNumber0001 > 0 ? Url.Action( "Pending", "AuditMgt/Audit", new  { NodeCode = "0001" }  ) : "javascript:void(0);")" class="@(AuditNumber0001 > 0 ? "active" : "disabled")">@(AuditNumber0001)</a></li>
+                                <li>招标资审待审批：<a href="@(AuditNumber0003 > 0 ? Url.Action( "Pending", "AuditMgt/Audit", new  { NodeCode = "0003" }  ) : " javascript:void(0);")" class="@(AuditNumber0003 > 0 ? "active" : "disabled")">@(AuditNumber0003)</a></li>
+                                <li>招标文件待审批：<a href="@(AuditNumber0002 > 0 ? Url.Action( "Pending", "AuditMgt/Audit", new  { NodeCode = "0002" }  ) : " javascript:void(0);")" class="@(AuditNumber0002 > 0 ? "active" : "disabled")">@(AuditNumber0002)</a></li>
+                                <li>定标结果待审批：<a href="@(AuditNumber0004 > 0 ? Url.Action( "Pending", "AuditMgt/Audit", new  { NodeCode = "0004" }  ) : " javascript:void(0);")" class="@(AuditNumber0004 > 0 ? "active" : "disabled")">@(AuditNumber0004)</a></li>                               
+                                <li>分供方准入待审批：<a href="@(AuditNumber1002 > 0 ? Url.Action( "Pending", "AuditMgt/Audit" , new  { NodeCode = "1002" } ) : " javascript:void(0);")" class="@(AuditNumber1002 > 0 ? "active" : "disabled")">@(AuditNumber1002)</a></li>
+                                <li>合同待审批：<a href="@(AuditNumber2000 > 0 ? Url.Action( "Pending", "AuditMgt/Audit", new  { NodeCode = "2000"}  ) : " javascript:void(0);")" class="@(AuditNumber2000 > 0 ? "active" : "disabled")">@(AuditNumber2000)</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget-body home">
+                <div class="row home-panel">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <ul class="systemlist">
+                            @if (YZ.Utility.Web.AuthManager.HasAuth( "AuthPortal_SystemApplication_List" ) )
+                            {
+                            <li>
+                                <a href="/AuthPortal/SystemApplication/List">
+                                    <img src="~/Content/img/index/indexIcon/authcenter.png"/>
+                                    <p class="system-name">授权中心</p>
+                                </a>
+                            </li>
+                            }
+                            @if (YZ.Utility.Web.AuthManager.HasAuth( "OperationMgt_SystemCategory_Index" ) )
+                            {
+                            <li>
+                                <a href="/OperationMgt/SystemCategory/Index">
+                                    <img src="~/Content/img/index/indexIcon/system.png"/>
+                                    <p class="system-name">运营后台</p>
+                                </a>
+                            </li>
+                            }
+                            @if (YZ.Utility.Web.AuthManager.HasAuth( "TenderMgt_Tender_List" ) )
+                            {
+                            <li>
+                                <a href="/TenderMgt/Tender/List">
+                                    <img src="~/Content/img/index/indexIcon/tender.png"/>
+                                    <p class="system-name">招标工具</p>
+                                </a>
+                            </li>
+                            }
+                            @if (YZ.Utility.Web.AuthManager.HasAuth("ContractMgt_Contract_List"))
+                            {
+                                <li>
+                                    <a href="/ContractMgt/Contract/List">
+                                        <img src="~/Content/img/index/indexIcon/contract.png" />
+                                        <p class="system-name">合同工具</p>
+                                    </a>
+                                </li>
+                            }
+                            <li>
+                                <a href="/MallMgt/Contract/Index">
+                                    <img src="~/Content/img/index/indexIcon/mall.png" />
+                                    <p class="system-name">企业商城</p>
+                                </a>
+                            </li>
+                            @if (YZ.Utility.Web.AuthManager.HasAuth( "AuditMgt_Audit_Pending" ) )
+                            {
+                            <li>
+                                <a href="/AuditMgt/Audit/Pending">
+                                    <img src="~/Content/img/index/indexIcon/audit.png"/>
+                                    <p class="system-name">审批工具</p>
+                                </a>
+                            </li>
+                            }
+                            @if (YZ.Utility.Web.AuthManager.HasAuth( "SupplierMgt_Supplier_MySupplierList" ) )
+                            {
+                            <li>
+                                <a href="/SupplierMgt/Supplier/TempSupplierList">
+                                    <img src="~/Content/img/index/indexIcon/supplier.png" />
+                                    <p class="system-name">分供方工具</p>
+                                </a>
+                            </li>
+                            }
+                            <li>
+                                <a href="/BidEvaluationMgt/BidEvaluation/List">
+                                    <img src="~/Content/img/index/indexIcon/bidevaluation.png" />
+                                    <p class="system-name">评标工具</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/InquiryMgt/Tender/List" name="/>">
+                                    <img src="~/Content/img/index/indexIcon/inquiry.png" />
+                                    <p class="system-name">询价工具</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/ReportMgt/KPICompleteReport/Index">
+                                    <img src="~/Content/img/index/indexIcon/report.png" />
+                                    <p class="system-name">报表中心</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section rsFooter{
+    <script>
+        $(".systemlist").find('a').on('mouseover', function () {
+            var $img = $(this).find('img');
+            var src = $img.prop('src').substr(0, $img.prop('src').length-4) + '-hover.png';
+            $img.prop('src', src);
+        }).on('mouseout', function () {
+            var $img = $(this).find('img');
+            var src = $img.prop('src').substr(0, $img.prop('src').length - 10) + '.png';
+            $img.prop('src', src);
+        });
+
+
+        /***/
+    </script>
+}

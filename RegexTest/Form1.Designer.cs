@@ -34,8 +34,13 @@
             this.tbContent = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.btnEnum = new System.Windows.Forms.Button();
+            this.btnCsHtml = new System.Windows.Forms.Button();
+            this.btnService = new System.Windows.Forms.Button();
             this.btnJS = new System.Windows.Forms.Button();
+            this.btnEnum = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button3 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -53,6 +58,9 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.button3);
+            this.tabPage1.Controls.Add(this.textBox1);
+            this.tabPage1.Controls.Add(this.label1);
             this.tabPage1.Controls.Add(this.button2);
             this.tabPage1.Controls.Add(this.tbContent);
             this.tabPage1.Controls.Add(this.button1);
@@ -96,6 +104,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.btnCsHtml);
+            this.tabPage2.Controls.Add(this.btnService);
             this.tabPage2.Controls.Add(this.btnJS);
             this.tabPage2.Controls.Add(this.btnEnum);
             this.tabPage2.Location = new System.Drawing.Point(4, 28);
@@ -105,6 +115,36 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Find";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // btnCsHtml
+            // 
+            this.btnCsHtml.Location = new System.Drawing.Point(795, 167);
+            this.btnCsHtml.Name = "btnCsHtml";
+            this.btnCsHtml.Size = new System.Drawing.Size(209, 63);
+            this.btnCsHtml.TabIndex = 7;
+            this.btnCsHtml.Text = "提取cshtml中的中文";
+            this.btnCsHtml.UseVisualStyleBackColor = true;
+            this.btnCsHtml.Click += new System.EventHandler(this.btnCsHtml_Click);
+            // 
+            // btnService
+            // 
+            this.btnService.Location = new System.Drawing.Point(544, 167);
+            this.btnService.Name = "btnService";
+            this.btnService.Size = new System.Drawing.Size(209, 63);
+            this.btnService.TabIndex = 6;
+            this.btnService.Text = "提取Service中的中文";
+            this.btnService.UseVisualStyleBackColor = true;
+            this.btnService.Click += new System.EventHandler(this.btnService_Click);
+            // 
+            // btnJS
+            // 
+            this.btnJS.Location = new System.Drawing.Point(293, 167);
+            this.btnJS.Name = "btnJS";
+            this.btnJS.Size = new System.Drawing.Size(209, 63);
+            this.btnJS.TabIndex = 5;
+            this.btnJS.Text = "提取JS中的中文";
+            this.btnJS.UseVisualStyleBackColor = true;
+            this.btnJS.Click += new System.EventHandler(this.btnJS_Click);
             // 
             // btnEnum
             // 
@@ -116,15 +156,32 @@
             this.btnEnum.UseVisualStyleBackColor = true;
             this.btnEnum.Click += new System.EventHandler(this.btnEnum_Click);
             // 
-            // btnJS
+            // label1
             // 
-            this.btnJS.Location = new System.Drawing.Point(293, 167);
-            this.btnJS.Name = "btnJS";
-            this.btnJS.Size = new System.Drawing.Size(209, 63);
-            this.btnJS.TabIndex = 5;
-            this.btnJS.Text = "提取JS中的中文";
-            this.btnJS.UseVisualStyleBackColor = true;
-            this.btnJS.Click += new System.EventHandler(this.btnJS_Click);
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(27, 374);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(323, 18);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "把一个字符串从右往左每4位加一个空格";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(384, 371);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(651, 28);
+            this.textBox1.TabIndex = 4;
+            this.textBox1.Text = "1234567890";
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(1075, 374);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 45);
+            this.button3.TabIndex = 5;
+            this.button3.Text = "button3";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // Form1
             // 
@@ -152,6 +209,11 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button btnEnum;
         private System.Windows.Forms.Button btnJS;
+        private System.Windows.Forms.Button btnService;
+        private System.Windows.Forms.Button btnCsHtml;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label1;
     }
 }
 
