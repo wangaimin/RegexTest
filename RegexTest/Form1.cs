@@ -30,6 +30,9 @@ namespace RegexTest
 
         private void button1_Click(object sender, EventArgs e)
         {
+           //$0 为匹配到的所有；$1为匹配到的第一个分组；$2为匹配到的第二个分组
+
+
             string v = @"fffffffffff
 
                         fffffffffff
@@ -167,6 +170,20 @@ namespace RegexTest
             string pattern = "(?!^)(?=(.{4})+$)";
             Regex regex = new Regex(pattern, RegexOptions.Multiline);
             textBox1.Text=regex.Replace(str, " ");
+
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            string str = "CSDN_hello-nihao_1/2/3";
+            string pattern = @"(?im)(CSDN_).*_(\D*\d+/.*?)(_.*|$)";
+            string result = Regex.Replace(str, pattern, "$1$2");
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string result = Regex.Replace("中国：", @"^([^\x00-\xff\s]+)[:：！!]+$", "$1", RegexOptions.Singleline);
+
 
         }
     }
