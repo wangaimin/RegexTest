@@ -1,4 +1,5 @@
 ﻿/****** Script for SelectTopNRows command from SSMS  ******/
+测试
 SELECT TOP 1000 [SysNo]
       ,[ParentSysNo]
       ,[OrganizationCode]
